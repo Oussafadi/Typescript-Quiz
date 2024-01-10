@@ -1,7 +1,9 @@
 import { EventHandler, FormEventHandler, useState } from 'react'
 import './App.css'
+import ScoreComponent from './components/ScoreComponent';
+import QuizForm from './components/QuizForm';
 
-type Question = {
+export type Question = {
   question :string,
   answer: string,
   options : string[],
@@ -37,7 +39,6 @@ const questions : Question[] =
 }
 ]
 
-
 function App() {
  const [currentQuestionNumber,setCurrentQuestionNumber] = useState<number>(0);
  const [answer,setAnswer] = useState<string>('');
@@ -46,10 +47,8 @@ function App() {
  
  const isGameOver = currentQuestionNumber>= questions.length;
 
-
  // Computed Values
  const currentQuestion =questions[currentQuestionNumber];
- const wrongAnswers = questions.length - score ;
  
 
 const handleSubmit = (e : any) => {
@@ -57,63 +56,29 @@ const handleSubmit = (e : any) => {
    
     if (answer === currentQuestion.answer) {
       setScore((score) => score +1);
-      if(score == questions.length) {
-        setMessage("Congratualtion you won");
-      }
+      
     }
     setCurrentQuestionNumber((currentQuestionNumber) => currentQuestionNumber +1) ;
-
-    
+  
 }
 
-function Quiz() {
- return ( <div className='quiz'>
-  <h1 className='question'>
-      { currentQuestion.question }
-  </h1>
-  <form className='form-options' onSubmit={handleSubmit}>
-  <div >
-      {currentQuestion.options.map(o => 
-        (
-          <div className='options'  key={o}>
-          <input type='radio' onChange={() => {setAnswer(o)}} value={o} name='answer' checked={o == answer }>
-          </input>
-          {o}
-          </div>
-        ))}
-  </div>
-  <button>Submit Answer</button>
-  </form>
-</div>
- )
+const handleReset = () => {
+  setCurrentQuestionNumber(0);
+  setScore(0);
+  setAnswer('');
 }
 
-function ScoreComponent() {
-  return (
-    <>
-       { score == questions.length ?  
-       (
-          <h2> {message} </h2>
-       ) 
-          :
-         (
-          <h2>  You got {wrongAnswers}  wrong </h2>
-           )
-       }
-      
-      </>
-  )
-}
 
   return (
     <>
     { isGameOver ? 
     (
-      <ScoreComponent/>
+      <ScoreComponent score={score} totalQuestions={questions.length}
+       reset={handleReset} />
     )
     :
     (
-     <Quiz/>
+     <QuizForm setAnswer={setAnswer} currentQuestion={currentQuestion} answer={answer} submit={handleSubmit} />
     )
     }
       
